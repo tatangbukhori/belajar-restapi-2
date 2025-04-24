@@ -4,50 +4,52 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserApiController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get data user login.
      */
     public function index()
     {
         $users = User::all();
 
-        return response()->json(['status' => true, 'message' => 'Get data success!', 'data' => $users]);
+        return $this->sendResponse(UserResource::collection($users), 'Get data success!');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Save data user.
      */
     public function store(StoreUserRequest $request)
     {
-        $validated = $request->validated();
+        $request->validated();
 
-        $users = User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json(['status' => true, 'message' => 'Save data success!', 'data' => $users]);
+        return $this->sendResponse(UserResource::collection($user), 'Save data success!');
     }
 
     /**
-     * Display the specified resource.
+     * Show data user.
      */
     public function show($id)
     {
         $user = User::find($id);
 
-        return response()->json(['status' => true, 'message' => 'Show data user success!', 'data' => $user]);
+        return $this->sendResponse(UserResource::collection($user), 'Show data user success!');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update data user.
      */
     public function update(StoreUserRequest $request, $id)
     {
@@ -61,18 +63,23 @@ class UserApiController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json(['status' => 'true', 'message' => 'Update data user success!', 'data' => $user]);
+        return $this->sendResponse(new UserResource($user), 'Update data user success!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete data user.
      */
     public function destroy($id)
     {
-        $user = User::find($id);
+        try {
+            // Search user by ID
+            $user = User::find($id);
+            // Delete user
+            $user->delete();
 
-        $user->delete();
-
-        return response()->json(['status' => 'true', 'message' => 'Delete data user success!', 'data' => null]);
+            return $this->sendResponse(null, 'Delete data user success!');
+        } catch (Exception $e) {
+            return $this->sendError('Error delete', $e->getMessage());
+        }
     }
 }
