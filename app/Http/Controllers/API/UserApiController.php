@@ -17,9 +17,9 @@ class UserApiController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::paginate(2);
 
-        return $this->sendResponse(UserResource::collection($users), 'Get data success!');
+        return $this->sendResponse(UserResource::collection($users)->resource, 'Get data success!');
     }
 
     /**
