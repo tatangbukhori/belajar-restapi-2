@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthApiController;
 use App\Http\Controllers\API\UserApiController;
-use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\CategoryApiController;
 
 // Get Data User Login
 Route::get('/user', function (Request $request) {
@@ -17,5 +18,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthApiController::class, 'logout']);
 });
 
+// Authentication
 Route::post('register', [AuthApiController::class, 'register']);
 Route::post('login', [AuthApiController::class, 'login']);
+
+// Categories
+Route::get('categories', [CategoryApiController::class, 'index']);
